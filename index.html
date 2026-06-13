@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Calculadora Inteligente - Ecom Expert Edition</title>
+  <meta name="description" content="Simulação financeira avançada e engenharia reversa de preços para delivery (iFood e Come Come Delivery) com motor de precificação psicológica.">
+  
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Outfit:wght@500;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+  
+  <!-- CSS Styles -->
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  
+  <div class="app-container">
+    
+    <!-- Header -->
+    <header class="app-header">
+      <div class="logo-area">
+        <img src="logo.jpg" alt="Logo Come Come" class="comecome-logo">
+        <div class="logo-text">
+          <h1>Calculadora Inteligente</h1>
+          <span class="logo-subtitle">Parceiro Come Come</span>
+        </div>
+      </div>
+      
+      <!-- Platform Selector Tabs -->
+      <div class="platform-tabs" id="platformTabs">
+        <button class="platform-tab active" data-platform="comecome" id="btnComeCome">
+          <span class="platform-dot comecome-dot"></span>
+          Come Come Delivery
+        </button>
+        <button class="platform-tab" data-platform="ifood" id="btnIFood">
+          <span class="platform-dot ifood-dot"></span>
+          iFood
+        </button>
+      </div>
+    </header>
+
+    <!-- Sub-header Mode Selector -->
+    <div class="mode-selector-wrapper">
+      <div class="mode-toggle">
+        <button class="mode-btn active" data-mode="reverso" id="btnModeReverso">
+          Modo Reverso <span class="badge-reverso">Sugerido</span>
+        </button>
+        <button class="mode-btn" data-mode="direto" id="btnModeDireto">
+          Análise Direta
+        </button>
+      </div>
+      <span class="mode-description" id="modeDesc">
+        <strong>Modo Reverso:</strong> Defina o lucro no bolso desejado e nós calculamos o preço de vitrine ideal.
+      </span>
+    </div>
+
+    <!-- Main Grid -->
+    <main class="dashboard-grid">
+      
+      <!-- Column 1: Parametros e Inputs -->
+      <section class="grid-card input-card" aria-labelledby="inputs-title">
+        <h2 id="inputs-title" class="section-title">
+          <i class="lucide-sliders"></i> Parâmetros Financeiros
+        </h2>
+
+        <!-- Dynamic Input Group (Reverso vs Direto) -->
+        <div id="groupReversoInput" class="input-group">
+          <label for="inputDesiredProfit">Lucro Líquido Desejado (No Bolso)</label>
+          <div class="input-prefix-wrapper">
+            <span class="currency-prefix">R$</span>
+            <input type="number" id="inputDesiredProfit" class="currency-input" value="15.00" step="0.50" min="0">
+          </div>
+          <span class="input-helper">Quanto você quer que sobre líquido em cada pedido após todas as taxas.</span>
+        </div>
+
+        <div id="groupDiretoInput" class="input-group hidden">
+          <label for="inputVitrinePriceInput">Preço de Vitrine Anunciado</label>
+          <div class="input-prefix-wrapper">
+            <span class="currency-prefix">R$</span>
+            <input type="number" id="inputVitrinePriceInput" class="currency-input" value="39.90" step="0.50" min="0">
+          </div>
+          <span class="input-helper">O preço exibido no cardápio do aplicativo de entrega.</span>
+        </div>
+
+        <!-- COGS / CMV -->
+        <div class="input-group">
+          <label for="inputCOGS">Custo de Insumo do Produto (CMV)</label>
+          <div class="input-prefix-wrapper">
+            <span class="currency-prefix">R$</span>
+            <input type="number" id="inputCOGS" class="currency-input" value="10.00" step="0.50" min="0">
+          </div>
+          <span class="input-helper">Custo de matéria-prima, ingredientes e preparação.</span>
+        </div>
+
+        <!-- Fixed Costs per Order -->
+        <div class="input-group">
+          <label for="inputFixedCosts">Custos Fixos / Embalagem por Pedido</label>
+          <div class="input-prefix-wrapper">
+            <span class="currency-prefix">R$</span>
+            <input type="number" id="inputFixedCosts" class="currency-input" value="3.50" step="0.50" min="0">
+          </div>
+          <span class="input-helper">Embalagem, sacolas, lacres e taxas fixas de transação.</span>
+        </div>
+
+        <!-- Platform Commission Presets (Only for iFood, hidden by default for Come Come) -->
+        <div class="input-group hidden" id="ifoodPresetsGroup">
+          <label>Planos de Comissão iFood</label>
+          <div class="commission-presets">
+            <button type="button" class="preset-btn" data-preset="12" id="presetIFoodBasic">Balcão (12%)</button>
+            <button type="button" class="preset-btn" data-preset="23" id="presetIFoodDelivery">Entrega (23%)</button>
+            <button type="button" class="preset-btn active" data-preset="custom" id="presetIFoodCustom">Personalizado</button>
+          </div>
+        </div>
+
+        <!-- Platform Commission -->
+        <div class="input-group">
+          <div class="label-with-value">
+            <label for="inputPlatformCommission" id="platformCommissionLabel">Comissão da Plataforma</label>
+            <span class="slider-value" id="valPlatformCommission">20%</span>
+          </div>
+          <div class="slider-wrapper">
+            <input type="range" id="inputPlatformCommission" min="0" max="40" value="20" step="1">
+          </div>
+          <span class="input-helper" id="platformCommissionHelper">Taxa padrão cobrada sobre o valor bruto de venda.</span>
+        </div>
+
+        <!-- Cashback / Co-participado -->
+        <div class="input-group">
+          <div class="label-with-value">
+            <label for="inputPlatformCashback">Cashback / Cupom Co-participado</label>
+            <span class="slider-value" id="valPlatformCashback">0%</span>
+          </div>
+          <div class="slider-wrapper">
+            <input type="range" id="inputPlatformCashback" min="0" max="25" value="0" step="0.5">
+          </div>
+          <span class="input-helper">Sua fatia em campanhas de incentivo, descontos ou cashback.</span>
+        </div>
+
+        <!-- Payment Method Fees -->
+        <div class="input-group">
+          <label>Meio de Pagamento Online</label>
+          <div class="payment-channels">
+            <div class="payment-card active" id="payPix">
+              <span class="payment-icon"><i class="lucide-qr-code"></i></span>
+              <span class="payment-name">PIX</span>
+              <div class="payment-rate-input-wrapper">
+                <input type="number" class="payment-rate-input" value="1.20" step="0.01" min="0" max="100">%
+              </div>
+            </div>
+            <div class="payment-card" id="payDebit">
+              <span class="payment-icon"><i class="lucide-wallet"></i></span>
+              <span class="payment-name">Débito</span>
+              <div class="payment-rate-input-wrapper">
+                <input type="number" class="payment-rate-input" value="1.99" step="0.01" min="0" max="100">%
+              </div>
+            </div>
+            <div class="payment-card" id="payCredit">
+              <span class="payment-icon"><i class="lucide-credit-card"></i></span>
+              <span class="payment-name">Crédito</span>
+              <div class="payment-rate-input-wrapper">
+                <input type="number" class="payment-rate-input" value="3.49" step="0.01" min="0" max="100">%
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Price Anchor -->
+        <div class="input-group">
+          <label for="inputAnchorPrice">Preço Âncora Promocional (Opcional "DE")</label>
+          <div class="input-prefix-wrapper">
+            <span class="currency-prefix">R$</span>
+            <input type="number" id="inputAnchorPrice" class="currency-input" placeholder="Ex: 49.90" step="0.50" min="0">
+          </div>
+          <span class="input-helper">Usado para exibir o preço riscado de desconto (efeito de ancoragem).</span>
+        </div>
+
+      </section>
+
+      <!-- Column 2: Resultados & Expert Advisory -->
+      <section class="grid-column-2-wrapper">
+        
+        <!-- Results Card -->
+        <div class="grid-card results-card" aria-labelledby="results-title">
+          <h2 id="results-title" class="section-title">
+            <i class="lucide-receipt-text"></i> Diagnóstico da Margem
+          </h2>
+
+          <div class="main-price-display">
+            <span class="price-label" id="mainPriceLabel">Preço de Vitrine Sugerido</span>
+            <div class="price-value-wrapper">
+              <span class="price-currency">R$</span>
+              <span class="price-main" id="displaySuggestedPrice">35,90</span>
+            </div>
+            <button class="copy-price-btn" id="btnCopyPrice" title="Copiar preço para o cardápio">
+              <i class="lucide-copy"></i>
+              <span>Copiar Preço</span>
+            </button>
+            
+            <!-- Psychological Pricing Quick Toggle -->
+            <div class="psychological-bar">
+              <div class="psy-toggle-wrapper">
+                <label class="toggle-switch">
+                  <input type="checkbox" id="checkPsychological" checked>
+                  <span class="toggle-slider"></span>
+                </label>
+                <span class="psy-toggle-label">Preço Psicológico Ativo</span>
+              </div>
+              
+              <div class="psy-options" id="psyOptions">
+                <select id="selectPsyTermination" class="psy-select">
+                  <option value="90">Terminação em .90</option>
+                  <option value="99">Terminação em .99</option>
+                  <option value="95">Terminação em .95</option>
+                  <option value="89">Terminação em .89</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <!-- Visual Price Composition Stacked Bar -->
+          <div class="price-composition-container">
+            <span class="composition-label">Distribuição do Valor de Venda</span>
+            <div class="composition-bar" id="compositionBar">
+              <div class="comp-segment desired-profit" id="segmentProfit" style="width: 30%;" title="Lucro Líquido"></div>
+              <div class="comp-segment cmv" id="segmentCmv" style="width: 30%;" title="CMV (Insumo)"></div>
+              <div class="comp-segment fixed-costs" id="segmentFixed" style="width: 15%;" title="Custos Fixos"></div>
+              <div class="comp-segment fees" id="segmentFees" style="width: 25%;" title="Taxas & Comissões"></div>
+            </div>
+            <div class="composition-legend">
+              <div class="legend-item">
+                <span class="legend-color desired-profit"></span>
+                <span>Lucro</span>
+                <span class="legend-value" id="legendValueProfit">R$ 0,00</span>
+              </div>
+              <div class="legend-item">
+                <span class="legend-color cmv"></span>
+                <span>CMV</span>
+                <span class="legend-value" id="legendValueCmv">R$ 0,00</span>
+              </div>
+              <div class="legend-item">
+                <span class="legend-color fixed-costs"></span>
+                <span>Custo Fixo</span>
+                <span class="legend-value" id="legendValueFixed">R$ 0,00</span>
+              </div>
+              <div class="legend-item">
+                <span class="legend-color fees"></span>
+                <span>Taxas</span>
+                <span class="legend-value" id="legendValueFees">R$ 0,00</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Gauge and Margin Status -->
+          <div class="margin-gauge-container">
+            <div class="gauge-header">
+              <span>Margem de Contribuição</span>
+              <span class="gauge-percentage-value" id="displayMarginPercent">32.7%</span>
+            </div>
+            <div class="gauge-track">
+              <div class="gauge-fill" id="marginGaugeFill" style="width: 32.7%;"></div>
+            </div>
+            <div class="gauge-status-badge success" id="marginStatusBadge">
+              <i class="lucide-check-circle-2"></i> Saudável
+            </div>
+          </div>
+
+          <!-- Detailed Fee Breakdown -->
+          <div class="cascade-breakdown">
+            <h3 class="breakdown-subtitle">Detalhamento das Taxas e Insumos</h3>
+            
+            <div class="breakdown-list" id="breakdownList">
+              <!-- Dynamically populated by JS -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Ecom Expert Advisor Card -->
+        <div class="grid-card expert-card" aria-labelledby="expert-title">
+          <div class="expert-header">
+            <div class="expert-avatar">
+              <i class="lucide-sparkles"></i>
+            </div>
+            <div>
+              <h2 id="expert-title" class="expert-name">Dicas do Ecom Expert</h2>
+              <span class="expert-role">Algoritmo Consultivo de Delivery</span>
+            </div>
+          </div>
+          
+          <div class="expert-content" id="expertAdviceBox">
+            <!-- Simulated AI Advice goes here -->
+          </div>
+        </div>
+
+      </section>
+
+
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="app-footer">
+      <p>Calculadora Inteligente - Ecom Expert Edition • Desenvolvido para alta fidelidade e margem de lucro real.</p>
+    </footer>
+
+  </div>
+
+  <!-- Scripts -->
+  <script src="app.js"></script>
+</body>
+</html>

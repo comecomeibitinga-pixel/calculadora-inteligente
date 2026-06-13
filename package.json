@@ -1,0 +1,14 @@
+{
+  "name": "calculadora-inteligente-ecom-expert",
+  "version": "1.0.0",
+  "description": "Calculadora de precificação estratégica e simulação de margens de lucro para marketplaces de delivery.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.19.2"
+  },
+  "author": "Ecom Expert",
+  "license": "MIT"
+}
