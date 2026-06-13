@@ -457,20 +457,20 @@ input[type="range"]::-webkit-slider-thumb:hover {
 }
 
 .payment-rate-input {
-  width: 38px;
-  background: transparent;
-  border: none;
-  border-bottom: 1px dashed transparent;
-  color: inherit;
+  width: 44px;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  color: var(--text-primary);
   font-family: inherit;
   font-size: inherit;
-  font-weight: inherit;
-  padding: 0;
-  margin: 0;
+  font-weight: 700;
+  padding: 1px 4px;
+  margin-right: 2px;
   outline: none;
   transition: var(--transition);
-  text-align: right;
-  cursor: pointer;
+  text-align: center;
+  cursor: text;
   -moz-appearance: textfield;
 }
 
@@ -482,7 +482,8 @@ input[type="range"]::-webkit-slider-thumb:hover {
 
 .payment-rate-input:hover,
 .payment-rate-input:focus {
-  border-bottom-color: currentColor;
+  border-color: var(--accent);
+  background: var(--bg-primary);
 }
 
 .hidden {

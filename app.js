@@ -58,7 +58,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // APPLICATION STATE
   // ==========================================
   const activePaymentCard = document.querySelector('.payment-card.active');
-  const initialPaymentRate = activePaymentCard ? (parseFloat(activePaymentCard.querySelector('.payment-rate-input').value) || 1.20) / 100 : 0.0120;
+  const initialPaymentRate = activePaymentCard ? (parseFloat(activePaymentCard.querySelector('.payment-rate-input').value) || 0.89) / 100 : 0.0089;
   const initialPaymentName = activePaymentCard ? activePaymentCard.querySelector('.payment-name').textContent : 'PIX';
 
   let state = {
@@ -140,10 +140,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const rateInput = card.querySelector('.payment-rate-input');
 
     // Click selects the payment card
-    card.addEventListener('click', (e) => {
-      // If clicking directly on the input, prevent double calculation trigger
-      if (e.target.tagName === 'INPUT') return;
-      
+    card.addEventListener('click', () => {
       paymentCards.forEach(c => c.classList.remove('active'));
       card.classList.add('active');
       
